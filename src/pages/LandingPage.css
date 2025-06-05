@@ -1,0 +1,12 @@
+.landing-container {
+    background-color: #002244;
+    height: 100vh;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .landing-logo {
+    width: 150px;
+    max-width: 80%;
+  }

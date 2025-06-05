@@ -1,0 +1,48 @@
+.airdrop-page {
+    padding: 1.5rem;
+    text-align: center;
+    background: #0a0f2c;
+    color: white;
+    min-height: 100vh;
+    padding-bottom: 6rem;
+  }
+  
+  .airdrop-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .airdrop-instructions {
+    background-color: #1c2340;
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  }
+  
+  .airdrop-tasks {
+    background-color: #d4d9f0;
+    border-radius: 16px;
+    padding: 1.2rem;
+    color: black;
+    font-size: medium;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  }
+
+  .airdrop-claim-btn {
+    background: #00bcd4;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+  
+  .airdrop-claim-btn:hover {
+    background: #0097a7;
+  }

@@ -1,0 +1,55 @@
+/* -----------------------------------
+   Marine theme for Tasks Page
+----------------------------------- */
+
+body {
+    background: #012a47;
+    color: #e9faff;
+    padding-bottom: 55px;
+  }
+  
+  /* Task card */
+  .task-card {
+    padding: 1px;
+    font-size: medium;
+    font-weight: 400;
+    margin-top: 5px;
+    background: black;
+    border-bottom: 5px black blur;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.18);
+    transition: transform 0.25s;
+  }
+  .task-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  /* Button */
+  .task-btn {
+    background: aqua;
+    border-radius: 30px;
+    padding: 8px;
+    border: none;
+    border-color: aqua;
+    margin-bottom: 5px;
+    display: justify;
+    justify-items: center;
+  }
+  .task-btn:hover {
+    background:#00bcd4;
+  }
+  
+  /* Countdown badge */
+  .countdown-badge {
+    background: #00bcd4;
+    border-radius: 8px;
+    padding: 3px 8px;
+    font-size: 0.8rem;
+    margin-left: 6px;
+    display: inline-block;
+  }
+
+  .container text-white{
+    display: inline-flexbox;
+    padding-bottom: 50px;
+  }
