@@ -16,7 +16,12 @@ function HomePage() {
     { name: 'Dwarf Lantern Shark', threshold: 0, image: '/ranks/dwarf-lantern.png' },
     { name: 'Pygmy Shark', threshold: 500, image: '/ranks/pygmy.png' },
     { name: 'Spotted Cat Shark', threshold: 1000, image: '/ranks/spotted-cat.png' },
-    { name: 'Horn Shark', threshold: 5000, image: '/ranks/horn.png' }
+    { name: 'Horn Shark', threshold: 5000, image: '/ranks/horn.png' },
+    { name: 'Blacktip reef Shark', threshold: 10000, image: '/ranks/blacktip.png' },
+    { name: 'Bull Shark', threshold: 50000, image: '/ranks/Bull-shark.png' },
+    { name: 'Hammerhead Shark', threshold: 100000, image: '/ranks/hammerhead.png' },
+    { name: 'Great White Shark', threshold: 500000, image: '/ranks/great-white.png' },
+    { name: 'Whale Shark', threshold: 1000000, image: '/ranks/whale.png' }
   ], []);
 
   const updateProgress = useCallback((balanceVal) => {
@@ -62,14 +67,19 @@ function HomePage() {
     };
   }, []);
 
-  // ✅ Fetch Telegram user and profile
-  useEffect(() => {
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+useEffect(() => {
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.ready(); // ✅ mark WebApp as ready
+    const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+
     if (tgUser && tgUser.id) {
       const telegramId = tgUser.id;
       getUserProfile(telegramId)
         .then(profile => {
-          setUser({ ...profile, telegramId }); // Optional: store more fields
+          setUser({ ...profile, telegramId });
+          setBalance(profile.balance || 0);
+          updateRank(profile.balance || 0);
+          updateProgress(profile.balance || 0);
         })
         .catch(err => {
           console.error("Failed to fetch user profile:", err.message);
@@ -77,7 +87,10 @@ function HomePage() {
     } else {
       console.warn("Telegram user not found");
     }
-  }, []);
+  } else {
+    console.warn("Telegram WebApp not available.");
+  }
+}, [updateRank, updateProgress]);
 
   const handleClick = () => {
     if (clicksLeft > 0) {
