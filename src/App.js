@@ -33,7 +33,22 @@ function App() {
         setUser(storedUser);
       }
     }
+  useEffect(() => {
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.ready();
 
+    const tgData = window.Telegram.WebApp.initDataUnsafe;
+    const telegramId = tgData.user?.id;
+    const telegramUsername = tgData.user?.username;
+
+    if (telegramId) {
+      localStorage.setItem("telegramId", telegramId);
+      localStorage.setItem("telegramUsername", telegramUsername);
+    }
+
+    console.log("Telegram ID:", telegramId);
+  }
+}, []);
     // Monetag Ad timer
     const adInterval = setInterval(() => {
       showMonetagAd();
