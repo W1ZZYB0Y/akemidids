@@ -4,7 +4,7 @@ import axios from 'axios';
 export const fetchTasks = async () => {
   const token = localStorage.getItem('adminToken');
   try {
-    const response = await axios.get('http://localhost:5000/api/admin/tasks', {
+    const response = await axios.get('https://akemidids-backend.onrender/api/admin/tasks', {
       headers: {
         Authorization: `Bearer ${token}`
       },
