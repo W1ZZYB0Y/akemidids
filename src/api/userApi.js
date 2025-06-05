@@ -1,13 +1,11 @@
 import axios from 'axios';
 
+const BASE_URL = 'https://akemidids-backend.onrender.com/api/users';
 
-
-
-const BASE_URL = 'https://akemidids-backend.onrender/api/users';
-
+// Complete a task
 export const completeTask = async (data) => {
   try {
-    const response = await axios.post(`${BASE_URL}/task`, data); // ✅ correct
+    const response = await axios.post(${BASE_URL}/task, data);
     return response.data;
   } catch (error) {
     console.error("Complete Task Error:", error.response?.data || error.message);
@@ -18,10 +16,10 @@ export const completeTask = async (data) => {
 // Get user profile (by Telegram ID)
 export const getUserProfile = async (telegramId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/${telegramId}`);
+    const response = await axios.get(${BASE_URL}/${telegramId});
     return response.data;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    console.error('Error fetching user profile:', error.response?.data || error.message);
     throw error;
   }
 };
