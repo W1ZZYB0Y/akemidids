@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 
-const BASE_URL = 'http://localhost:5000/api/users';
+const BASE_URL = 'https://akemidids-backend.onrender/api/users';
 
 export const completeTask = async (data) => {
   try {
