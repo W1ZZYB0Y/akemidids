@@ -15,8 +15,8 @@ import { showMonetagAd } from './utils/monetagLoader';
 function App() {
   const [user, setUser] = useState(null);
 
+  // ✅ Effect for loading Telegram user
   useEffect(() => {
-    // Attempt to load from Telegram WebApp
     const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
 
     if (tgUser) {
@@ -27,29 +27,33 @@ function App() {
       localStorage.setItem("user", JSON.stringify(parsedUser));
       setUser(parsedUser);
     } else {
-      // fallback to localStorage
       const storedUser = JSON.parse(localStorage.getItem("user"));
       if (storedUser) {
         setUser(storedUser);
       }
     }
+  }, []);
+
+  // ✅ Separate effect for WebApp ready + Telegram ID logging
   useEffect(() => {
-  if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
 
-    const tgData = window.Telegram.WebApp.initDataUnsafe;
-    const telegramId = tgData.user?.id;
-    const telegramUsername = tgData.user?.username;
+      const tgData = window.Telegram.WebApp.initDataUnsafe;
+      const telegramId = tgData.user?.id;
+      const telegramUsername = tgData.user?.username;
 
-    if (telegramId) {
-      localStorage.setItem("telegramId", telegramId);
-      localStorage.setItem("telegramUsername", telegramUsername);
+      if (telegramId) {
+        localStorage.setItem("telegramId", telegramId);
+        localStorage.setItem("telegramUsername", telegramUsername);
+      }
+
+      console.log("Telegram ID:", telegramId);
     }
+  }, []);
 
-    console.log("Telegram ID:", telegramId);
-  }
-}, []);
-    // Monetag Ad timer
+  // ✅ Separate effect for Monetag ad timer
+  useEffect(() => {
     const adInterval = setInterval(() => {
       showMonetagAd();
     }, 6 * 60 * 1000);
