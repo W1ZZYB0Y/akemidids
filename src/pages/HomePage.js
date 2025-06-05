@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, ProgressBar } from 'react-bootstrap';
 import BottomNav from '../components/BottomNav';
 import './HomePage.css';
+import { getUserProfile } from '../api/userApi'; // ✅ import your API
 
 function HomePage() {
   const [balance, setBalance] = useState(0);
@@ -9,6 +10,7 @@ function HomePage() {
   const [progress, setProgress] = useState(0);
   const [rank, setRank] = useState('Dwarf Lantern Shark');
   const [showRankUp, setShowRankUp] = useState(false);
+  const [user, setUser] = useState(null); // ✅ user state
 
   const ranks = useMemo(() => [
     { name: 'Dwarf Lantern Shark', threshold: 0, image: '/ranks/dwarf-lantern.png' },
@@ -60,6 +62,23 @@ function HomePage() {
     };
   }, []);
 
+  // ✅ Fetch Telegram user and profile
+  useEffect(() => {
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    if (tgUser && tgUser.id) {
+      const telegramId = tgUser.id;
+      getUserProfile(telegramId)
+        .then(profile => {
+          setUser({ ...profile, telegramId }); // Optional: store more fields
+        })
+        .catch(err => {
+          console.error("Failed to fetch user profile:", err.message);
+        });
+    } else {
+      console.warn("Telegram user not found");
+    }
+  }, []);
+
   const handleClick = () => {
     if (clicksLeft > 0) {
       const newBalance = balance + 1;
@@ -87,6 +106,11 @@ function HomePage() {
             <div className="rank-name mt-1">{rank}</div>
           </div>
         </div>
+        {user && (
+          <div className="text-muted small mt-2">
+            Logged in as <strong>@{user.username || user.telegramId}</strong>
+          </div>
+        )}
       </div>
 
       {/* Middle Section: Clicker */}
