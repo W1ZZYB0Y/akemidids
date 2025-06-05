@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, ProgressBar } from 'react-bootstrap';
 import BottomNav from '../components/BottomNav';
 import './HomePage.css';
-import { getUserProfile } from '../api/userApi'; // ✅ import your API
+import { getUserProfile } from '../api/userApi'; 
 
 function HomePage() {
   const [balance, setBalance] = useState(0);
@@ -10,7 +10,7 @@ function HomePage() {
   const [progress, setProgress] = useState(0);
   const [rank, setRank] = useState('Dwarf Lantern Shark');
   const [showRankUp, setShowRankUp] = useState(false);
-  const [user, setUser] = useState(null); // ✅ user state
+  const [user, setUser] = useState(null); 
 
   const ranks = useMemo(() => [
     { name: 'Dwarf Lantern Shark', threshold: 0, image: '/ranks/dwarf-lantern.png' },
@@ -69,7 +69,7 @@ function HomePage() {
 
 useEffect(() => {
   if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.ready(); // ✅ mark WebApp as ready
+    window.Telegram.WebApp.ready(); 
     const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
 
     if (tgUser && tgUser.id) {
