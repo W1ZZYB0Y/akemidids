@@ -1,50 +1,22 @@
+// src/pages/LandingPage.js
 import React, { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 
 function LandingPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const initUser = async () => {
-      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const user = window?.Telegram?.WebApp?.initDataUnsafe?.user;
 
-      if (!tgUser) {
-        console.error("Telegram user not found.");
-        return;
-      }
+    if (!user) {
+      console.warn("Telegram user not found.");
+      // You might redirect to an error or intro page if needed
+    }
 
-      const userData = {
-        telegramId: tgUser.id,
-        username: tgUser.username,
-        referredBy: searchParams.get("ref"),
-        ip: "", // Optional, backend may set it from request
-      };
-
-      try {
-        const response = await fetch("https://akemidids-backend.onrender.com/api/users/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userData),
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          localStorage.setItem("user", JSON.stringify(result));
-          navigate("/home");
-        } else {
-          console.error("Registration failed:", result.error);
-        }
-      } catch (err) {
-        console.error("Error registering user:", err.message);
-      }
-    };
-
-    initUser();
-  }, [navigate, searchParams]);
+    const timer = setTimeout(() => navigate('/home'), 3000);
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   return (
     <div className="landing-container d-flex flex-column justify-content-center align-items-center">
