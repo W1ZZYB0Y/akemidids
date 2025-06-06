@@ -1,10 +1,19 @@
 // src/pages/FriendsPage.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import BottomNav from '../components/BottomNav';
 import './FriendsPage.css';
 
 function FriendsPage() {
-  const referralLink = `https://akemidids.vercel.app/?ref=${user?.username};`;
+  const [user, setUser] = useState(null);
+  const [referralLink, setReferralLink] = useState('');
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    setUser(storedUser);
+    if (storedUser?.username) {
+      setReferralLink(`https://akemidids.vercel.app/?ref=${storedUser.username}`);
+    }
+  }, []);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
