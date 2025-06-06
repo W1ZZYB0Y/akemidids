@@ -4,7 +4,7 @@ import BottomNav from '../components/BottomNav';
 import './FriendsPage.css';
 
 function FriendsPage() {
-  const referralLink = `${window.location.origin}/?ref=yourUsername`;
+  const referralLink = `https://akemidids.vercel.app/?ref=${user?.username};`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
