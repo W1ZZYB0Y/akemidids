@@ -15,7 +15,7 @@ function FriendsPage() {
     if (user) {
       const nameToUse = user.username || user.id;
       setUsername(nameToUse);
-      setReferralLink(https://akemidids.vercel.app/?ref=${nameToUse});
+      setReferralLink(`https://akemidids.vercel.app/?ref=${nameToUse}`);
     }
   }, []);
 
