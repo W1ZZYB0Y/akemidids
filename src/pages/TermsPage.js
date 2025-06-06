@@ -15,7 +15,7 @@ const TermsPage = () => {
           </li>
           <li>
             <strong>No Monetary Value</strong><br />
-            All in-game currencies, tokens, or points earned or distributed within Jaws currently have no real-world or monetary value.
+            All in-game currencies, tokens, or points earned or distributed within Jaws currently have no real-world or monetary value YET.
           </li>
           <li>
             <strong>Eligibility</strong><br />
@@ -33,7 +33,7 @@ const TermsPage = () => {
           </li>
           <li>
             <strong>Ads and Promotions</strong><br />
-            We are not responsible for third-party ad content.
+            We are responsible for third-party ad content.
           </li>
           <li>
             <strong>Disclaimer</strong><br />
@@ -53,7 +53,7 @@ const TermsPage = () => {
           </li>
           <li>
             <strong>Contact</strong><br />
-            For inquiries, contact us via Telegram or email [jawscomm].
+            For inquiries, contact us via Telegram or email [jawscommunity@gmail.com].
           </li>
         </ol>
       </Card>
