@@ -17,7 +17,7 @@ function FriendsPage() {
     : 'Telegram user not found';
 
   const copyToClipboard = () => {
-    if (referralLink !== 'Telegram user not found') {
+    if (username) {
       navigator.clipboard.writeText(referralLink);
       alert('Referral link copied!');
     }
@@ -30,8 +30,8 @@ function FriendsPage() {
         Share your referral link below and earn rewards when your friends join and start clicking!
       </p>
       <div className="referral-box">
-        <input type="text" value={referralLink} readOnly className="code" />
-        <button onClick={copyToClipboard} className="copy-button">Copy</button>
+        <input type="text" value={referralLink} readOnly className='code' />
+        <button onClick={copyToClipboard} className='copy-button'>Copy</button>
       </div>
 
       <BottomNav />
