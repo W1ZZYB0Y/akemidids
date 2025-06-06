@@ -10,7 +10,7 @@ function FriendsPage() {
     const user = window?.Telegram?.WebApp?.initDataUnsafe?.user;
 
     if (user?.username) {
-      setReferralLink(https://akemidids.vercel.app/?ref=${user.username});
+      setReferralLink(`https://akemidids.vercel.app/?ref=${user.username}`);
     } else {
       setReferralLink('Telegram user not found');
     }
