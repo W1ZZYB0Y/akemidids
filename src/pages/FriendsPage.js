@@ -4,20 +4,23 @@ import BottomNav from '../components/BottomNav';
 import './FriendsPage.css';
 
 function FriendsPage() {
-  const [user, setUser] = useState(null);
   const [referralLink, setReferralLink] = useState('');
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
-    if (storedUser?.username) {
-      setReferralLink(`https://akemidids.vercel.app/?ref=${storedUser.username}`);
+    const user = window?.Telegram?.WebApp?.initDataUnsafe?.user;
+
+    if (user?.username) {
+      setReferralLink(https://akemidids.vercel.app/?ref=${user.username});
+    } else {
+      setReferralLink('Telegram user not found');
     }
   }, []);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralLink);
-    alert('Referral link copied!');
+    if (referralLink && referralLink !== 'Telegram user not found') {
+      navigator.clipboard.writeText(referralLink);
+      alert('Referral link copied!');
+    }
   };
 
   return (
