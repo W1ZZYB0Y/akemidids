@@ -6,6 +6,10 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
 
+if (window.Telegram?.WebApp) {
+  window.Telegram.WebApp.ready();
+}
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
