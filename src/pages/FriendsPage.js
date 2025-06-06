@@ -13,8 +13,7 @@ function FriendsPage() {
   }, []);
 
   const referralLink = username
-    ? `https://akemidids.vercel.app/?ref=${username}`
-    : 'Telegram user not found';
+    ? `https://akemidids.vercel.app/?ref=${username}`;
 
   const copyToClipboard = () => {
     if (username) {
