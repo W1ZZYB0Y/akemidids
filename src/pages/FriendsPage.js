@@ -3,7 +3,7 @@ import BottomNav from '../components/BottomNav';
 import './FriendsPage.css';
 
 function FriendsPage() {
-  const [username, setUsername] = useState(null);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -12,14 +12,11 @@ function FriendsPage() {
     }
   }, []);
 
-  const referralLink = username
-    ? `https://akemidids.vercel.app/?ref=${username}`;
+  const referralLink = https://akemidids.vercel.app/?ref=${username};
 
   const copyToClipboard = () => {
-    if (username) {
-      navigator.clipboard.writeText(referralLink);
-      alert('Referral link copied!');
-    }
+    navigator.clipboard.writeText(referralLink);
+    alert('Referral link copied!');
   };
 
   return (
@@ -29,8 +26,8 @@ function FriendsPage() {
         Share your referral link below and earn rewards when your friends join and start clicking!
       </p>
       <div className="referral-box">
-        <input type="text" value={referralLink} readOnly className='code' />
-        <button onClick={copyToClipboard} className='copy-button'>Copy</button>
+        <input type="text" value={referralLink} readOnly className="code" />
+        <button onClick={copyToClipboard} className="copy-button">Copy</button>
       </div>
 
       <BottomNav />
