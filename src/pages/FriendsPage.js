@@ -4,15 +4,20 @@ import './FriendsPage.css';
 
 function FriendsPage() {
   const [username, setUsername] = useState('');
+  const [referralLink, setReferralLink] = useState('');
 
   useEffect(() => {
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    if (tgUser) {
-      setUsername(tgUser.username || tgUser.id);
+    const tg = window.Telegram?.WebApp;
+    const user = tg?.initDataUnsafe?.user;
+
+    console.log("Telegram user:", user); // ✅ Log the user to see what's available
+
+    if (user) {
+      const nameToUse = user.username || user.id;
+      setUsername(nameToUse);
+      setReferralLink(https://akemidids.vercel.app/?ref=${nameToUse});
     }
   }, []);
-
-  const referralLink = `https://akemidids.vercel.app/?ref=${username}`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
