@@ -12,7 +12,7 @@ function FriendsPage() {
     }
   }, []);
 
-  const referralLink = https://akemidids.vercel.app/?ref=${username};
+  const referralLink = `https://akemidids.vercel.app/?ref=${username}`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
