@@ -3,8 +3,8 @@ import BottomNav from '../components/BottomNav';
 import './FriendsPage.css';
 
 function FriendsPage() {
-  const [username, setusername] = useState('');
-  const [referralLink, setreferralLink] = useState('');
+  const [username, setUsername] = useState('');
+  const [referralLink, setReferralLink] = useState('');
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
