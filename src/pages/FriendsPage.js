@@ -7,21 +7,22 @@ function FriendsPage() {
   const [referralLink, setReferralLink] = useState('');
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    const user = tg?.initDataUnsafe?.user;
-
-    console.log("Telegram user:", user); // ✅ Log the user to see what's available
-
-    if (user) {
-      const nameToUse = user.username || user.id;
-      setUsername(nameToUse);
-      setReferralLink(`https://akemidids.vercel.app/?ref=${nameToUse}`);
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    if (user && user.username) {
+      setUsername(user.username);
+      setReferralLink(`https://akemidids.vercel.app/?ref=${user.username}`);
+    } else if (user && user.id) {
+      // fallback if username doesn't exist
+      setUsername(user.id);
+      setReferralLink(`https://akemidids.vercel.app/?ref=${user.id}`);
     }
   }, []);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralLink);
-    alert('Referral link copied!');
+    if (referralLink) {
+      navigator.clipboard.writeText(referralLink);
+      alert('Referral link copied!');
+    }
   };
 
   return (
@@ -30,11 +31,14 @@ function FriendsPage() {
       <p className="friends-text">
         Share your referral link below and earn rewards when your friends join and start clicking!
       </p>
-      <div className="referral-box">
-        <input type="text" value={referralLink} readOnly className="code" />
-        <button onClick={copyToClipboard} className="copy-button">Copy</button>
-      </div>
-
+      {referralLink ? (
+        <div className="referral-box">
+          <input type="text" value={referralLink} readOnly className='code' />
+          <button onClick={copyToClipboard} className='copy-button'>Copy</button>
+        </div>
+      ) : (
+        <p className="text-white text-center">Loading referral link...</p>
+      )}
       <BottomNav />
     </div>
   );
