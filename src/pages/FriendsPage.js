@@ -34,10 +34,10 @@ function FriendsPage() {
     }
   };
 
-  const copyToClipboard = () => {
-    if (referralLink) {
-      navigator.clipboard.writeText(referralLink);
-      alert('Referral link copied!');
+  const copyToClipboard = (text) => {
+    if (text) {
+      navigator.clipboard.writeText(text);
+      alert('Link copied!');
     }
   };
 
@@ -50,14 +50,17 @@ function FriendsPage() {
 
       {referralLink ? (
         <>
+          {/* Referral Link */}
           <div className="referral-box">
-            <input type="text" value={referralLink} readOnly className='code' />
-            <button onClick={copyToClipboard} className='copy-button'>Copy</button>
+            <input type="text" value={referralLink} readOnly className="code" />
+            <button onClick={() => copyToClipboard(referralLink)} className="copy-button">Copy</button>
           </div>
 
-          <div className="general-link-box mt-4">
+          {/* General Link */}
+          <div className="referral-box">
             <p className="text-white mb-1">General Link</p>
-            <input type="text" value={generalLink} readOnly className='code' />
+            <input type="text" value={generalLink} readOnly className="code" />
+            <button onClick={() => copyToClipboard(generalLink)} className="copy-button">Copy</button>
           </div>
         </>
       ) : (
@@ -65,7 +68,7 @@ function FriendsPage() {
       )}
 
       {referralCount !== null && (
-        <p className="referral-count">
+        <p className="referral-count text-center mt-3">
           You have referred <strong>{referralCount}</strong> friend{referralCount === 1 ? '' : 's'}!
         </p>
       )}
