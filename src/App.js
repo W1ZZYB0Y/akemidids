@@ -13,58 +13,49 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { showMonetagAd } from './utils/monetagLoader';
 
 function App() {
-const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-useEffect(() => {
-    // Attempt to load from Telegram WebApp
-const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+  useEffect(() => {
+    // Telegram initialization
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.ready();
+      const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
 
-if (tgUser) {
-localStorage.setItem("user", JSON.stringify(parsedUser));
-setUser(parsedUser);
-} else {
-      // fallback to localStorage
-const storedUser = JSON.parse(localStorage.getItem("user"));
-if (storedUser) {
-setUser(storedUser);
-}
-}
-useEffect(() => {
-  if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.ready();
+      if (tgUser) {
+        setUser(tgUser);
+        localStorage.setItem("user", JSON.stringify(tgUser));
+        if (tgUser.id) localStorage.setItem("telegramId", tgUser.id);
+        if (tgUser.username) localStorage.setItem("telegramUsername", tgUser.username);
+        console.log("Telegram ID:", tgUser.id);
+        console.log("Telegram Username:", tgUser.username);
+      } else {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) {
+          setUser(storedUser);
+        }
+      }
+    }
 
-    const tgData = window.Telegram.WebApp.initDataUnsafe;
-    const telegramId = tgData.user?.id;
-    const telegramUsername = tgData.user?.username;
+    // Monetag ad interval
+    const adInterval = setInterval(() => {
+      showMonetagAd();
+    }, 6 * 60 * 1000);
 
-    if (telegramId) {
-      localStorage.setItem("telegramId", telegramId);
-      localStorage.setItem("telegramUsername", telegramUsername);
-}
+    return () => clearInterval(adInterval);
+  }, []);
 
-    console.log("Telegram ID:", telegramId);
-  }
-}, []);
-    // Monetag Ad timer
-const adInterval = setInterval(() => {
-showMonetagAd();
-}, 6 * 60 * 1000);
-
-return () => clearInterval(adInterval);
-}, []);
-
-return (
-<Routes>
-<Route path="/" element={<LandingPage />} />
-<Route path="/home" element={<HomePage user={user} />} />
-<Route path="/friends" element={<FriendsPage user={user} />} />
-<Route path="/terms" element={<TermsPage />} />
-<Route path="/tasks" element={<><TasksPage user={user} /><BottomNav /></>} />
-<Route path="/airdrop" element={<><AirdropPage user={user} /><BottomNav /></>} />
-<Route path="/admin" element={<AdminLogin />} />
-<Route path="/admin/dashboard" element={<AdminDashboard />} />
-</Routes>
-);
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/home" element={<HomePage user={user} />} />
+      <Route path="/friends" element={<FriendsPage user={user} />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/tasks" element={<><TasksPage user={user} /><BottomNav /></>} />
+      <Route path="/airdrop" element={<><AirdropPage user={user} /><BottomNav /></>} />
+      <Route path="/admin" element={<AdminLogin />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+    </Routes>
+  );
 }
 
 export default App;
