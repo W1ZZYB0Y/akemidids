@@ -5,7 +5,23 @@
     min-height: 100vh;
     padding-bottom: 6rem;
   }
-  
+
+.general-link-box {
+  text-align: center;
+  margin-top: 20px;
+}
+.code {
+  width: 90%;
+  margin: 0 auto;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+.copy-button {
+  margin-top: 10px;
+  padding: 8px 16px;
+}
+
   .friends-title {
     font-size: 1.8rem;
     font-weight: bold;
