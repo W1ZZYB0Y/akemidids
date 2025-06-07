@@ -5,13 +5,15 @@ import './HomePage.css';
 import { getUserProfile } from '../api/userApi';
 
 function HomePage() {
+  const MAX_CLICKS = 10;
   const [balance, setBalance] = useState(0);
-  const [clicksLeft, setClicksLeft] = useState(10);
+  const [clicksLeft, setClicksLeft] = useState(MAX_CLICKS);
   const [progress, setProgress] = useState(0);
   const [rank, setRank] = useState('Dwarf Lantern Shark');
   const [showRankUp, setShowRankUp] = useState(false);
   const [user, setUser] = useState(null);
   const [refillTime, setRefillTime] = useState(null);
+  const [countdown, setCountdown] = useState(0);
 
   const ranks = useMemo(() => [
     { name: 'Dwarf Lantern Shark', threshold: 0, image: '/ranks/dwarf-lantern.png' },
@@ -34,10 +36,12 @@ function HomePage() {
 
   const updateRank = useCallback((balanceVal) => {
     const currentRank = ranks.find(r => balanceVal < r.threshold) || ranks[ranks.length - 1];
-    if (currentRank.name !== rank) {
+    const currentIndex = ranks.indexOf(currentRank);
+    const prevIndex = ranks.findIndex(r => r.name === rank);
+    if (currentIndex > prevIndex) {
       setRank(currentRank.name);
       setShowRankUp(true);
-      setClicksLeft(10);
+      setClicksLeft(MAX_CLICKS);
     }
   }, [ranks, rank]);
 
@@ -54,7 +58,7 @@ function HomePage() {
         setRefillTime(new Date(lastRefill));
         setClicksLeft(0);
       } else {
-        setClicksLeft(10);
+        setClicksLeft(MAX_CLICKS);
         localStorage.removeItem('click-refill-time');
       }
     }
@@ -68,13 +72,16 @@ function HomePage() {
   }, [showRankUp]);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "//libtl.com/sdk.js";
-    script.setAttribute("data-zone", "9322228");
-    script.setAttribute("data-sdk", "show_9322228");
-    script.async = true;
-    document.body.appendChild(script);
-    return () => document.body.removeChild(script);
+    const existingScript = document.getElementById('libtl-sdk');
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "//libtl.com/sdk.js";
+      script.setAttribute("data-zone", "9322228");
+      script.setAttribute("data-sdk", "show_9322228");
+      script.async = true;
+      script.id = 'libtl-sdk';
+      document.body.appendChild(script);
+    }
   }, []);
 
   useEffect(() => {
@@ -85,24 +92,33 @@ function HomePage() {
         const telegramId = tgUser.id;
         getUserProfile(telegramId)
           .then(profile => {
-            setUser({ ...profile, telegramId });
+            const fullProfile = { ...profile, telegramId };
+            setUser(fullProfile);
             setBalance(profile.balance || 0);
             updateRank(profile.balance || 0);
             updateProgress(profile.balance || 0);
+            localStorage.setItem('jaws-user', JSON.stringify(fullProfile));
           })
-          .catch(err => console.error("Failed to fetch user profile:", err.message));
+          .catch(() => {
+            const localUser = JSON.parse(localStorage.getItem('jaws-user'));
+            if (localUser) setUser(localUser);
+          });
       }
     }
   }, [updateRank, updateProgress]);
 
-  // Timer to auto-refill clicks
   useEffect(() => {
     if (refillTime) {
       const interval = setInterval(() => {
-        if (new Date() >= new Date(refillTime)) {
-          setClicksLeft(10);
+        const now = new Date();
+        const timeLeft = Math.max(0, Math.ceil((new Date(refillTime) - now) / 1000));
+        setCountdown(timeLeft);
+
+        if (timeLeft <= 0) {
+          setClicksLeft(MAX_CLICKS);
           setRefillTime(null);
           localStorage.removeItem('click-refill-time');
+          clearInterval(interval);
         }
       }, 1000);
       return () => clearInterval(interval);
@@ -120,7 +136,7 @@ function HomePage() {
       updateProgress(newBalance);
 
       if (newClicks === 0) {
-        const refill = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+        const refill = new Date(Date.now() + 10 * 60 * 1000);
         setRefillTime(refill);
         localStorage.setItem('click-refill-time', refill.toISOString());
       }
@@ -133,7 +149,7 @@ function HomePage() {
 
   return (
     <div className="homepage-container">
-      {/* Top Section: Rank Progress */}
+      {/* Rank Section */}
       <div className="rank-section text-center mb-4">
         <div className="d-flex justify-content-center align-items-center gap-3">
           <img src={currentRankObj.image} alt={rank} className="rank-image" />
@@ -149,7 +165,7 @@ function HomePage() {
         )}
       </div>
 
-      {/* Middle Section: Clicker */}
+      {/* Clicker Section */}
       <div className="text-center my-4">
         <img
           src="/clicker.png"
@@ -157,11 +173,14 @@ function HomePage() {
           className="clicker-image"
           onClick={handleClick}
         />
+        {refillTime && (
+          <div className="text-muted mt-2">Refill in {countdown}s</div>
+        )}
       </div>
 
-      {/* Bottom Section: Stats */}
+      {/* Footer Stats */}
       <div className="footer-stats-container">
-        <div className="left-stat">Clicks Left: {clicksLeft}</div>
+        <div className="left-stat">Clicks Left: {clicksLeft} / {MAX_CLICKS}</div>
         <div className="right-stat">Balance: {balance}</div>
       </div>
 
