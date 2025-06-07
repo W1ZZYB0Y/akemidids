@@ -1,3 +1,4 @@
+// src/pages/FriendsPage.js
 import React, { useEffect, useState } from 'react';
 import BottomNav from '../components/BottomNav';
 import './FriendsPage.css';
