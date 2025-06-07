@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, ProgressBar } from 'react-bootstrap';
 import BottomNav from '../components/BottomNav';
 import './HomePage.css';
-import { getUserProfile } from '../api/userApi'; 
+import { getUserProfile } from '../api/userApi';
 
 function HomePage() {
   const [balance, setBalance] = useState(0);
@@ -10,7 +10,8 @@ function HomePage() {
   const [progress, setProgress] = useState(0);
   const [rank, setRank] = useState('Dwarf Lantern Shark');
   const [showRankUp, setShowRankUp] = useState(false);
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
+  const [refillTime, setRefillTime] = useState(null);
 
   const ranks = useMemo(() => [
     { name: 'Dwarf Lantern Shark', threshold: 0, image: '/ranks/dwarf-lantern.png' },
@@ -45,6 +46,18 @@ function HomePage() {
     setBalance(storedBalance);
     updateRank(storedBalance);
     updateProgress(storedBalance);
+
+    const lastRefill = localStorage.getItem('click-refill-time');
+    if (lastRefill) {
+      const remaining = new Date(lastRefill).getTime() - Date.now();
+      if (remaining > 0) {
+        setRefillTime(new Date(lastRefill));
+        setClicksLeft(0);
+      } else {
+        setClicksLeft(10);
+        localStorage.removeItem('click-refill-time');
+      }
+    }
   }, [ranks, updateProgress, updateRank]);
 
   useEffect(() => {
@@ -61,36 +74,40 @@ function HomePage() {
     script.setAttribute("data-sdk", "show_9322228");
     script.async = true;
     document.body.appendChild(script);
-  
-    return () => {
-      document.body.removeChild(script);
-    };
+    return () => document.body.removeChild(script);
   }, []);
 
-useEffect(() => {
-  if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.ready(); 
-    const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-
-    if (tgUser && tgUser.id) {
-      const telegramId = tgUser.id;
-      getUserProfile(telegramId)
-        .then(profile => {
-          setUser({ ...profile, telegramId });
-          setBalance(profile.balance || 0);
-          updateRank(profile.balance || 0);
-          updateProgress(profile.balance || 0);
-        })
-        .catch(err => {
-          console.error("Failed to fetch user profile:", err.message);
-        });
-    } else {
-      console.warn("Telegram user not found");
+  useEffect(() => {
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.ready();
+      const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (tgUser?.id) {
+        const telegramId = tgUser.id;
+        getUserProfile(telegramId)
+          .then(profile => {
+            setUser({ ...profile, telegramId });
+            setBalance(profile.balance || 0);
+            updateRank(profile.balance || 0);
+            updateProgress(profile.balance || 0);
+          })
+          .catch(err => console.error("Failed to fetch user profile:", err.message));
+      }
     }
-  } else {
-    console.warn("Telegram WebApp not available.");
-  }
-}, [updateRank, updateProgress]);
+  }, [updateRank, updateProgress]);
+
+  // Timer to auto-refill clicks
+  useEffect(() => {
+    if (refillTime) {
+      const interval = setInterval(() => {
+        if (new Date() >= new Date(refillTime)) {
+          setClicksLeft(10);
+          setRefillTime(null);
+          localStorage.removeItem('click-refill-time');
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [refillTime]);
 
   const handleClick = () => {
     if (clicksLeft > 0) {
@@ -101,8 +118,14 @@ useEffect(() => {
       localStorage.setItem('jaws-balance', newBalance);
       updateRank(newBalance);
       updateProgress(newBalance);
+
+      if (newClicks === 0) {
+        const refill = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+        setRefillTime(refill);
+        localStorage.setItem('click-refill-time', refill.toISOString());
+      }
     } else {
-      alert("You've reached your click limit!");
+      alert("You've reached your click limit! Refill in 10 minutes.");
     }
   };
 
