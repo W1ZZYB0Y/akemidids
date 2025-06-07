@@ -7,10 +7,10 @@ import './TasksPage.css';
 const TasksPage = ({ user }) => {
   const [tasks, setTasks] = useState([]);
   const [timers, setTimers] = useState({});
+  const [completedTasks, setCompletedTasks] = useState([]);
 
   useEffect(() => {
     const staticTasks = [
-
       {
         _id: 'example1',
         name: 'Join our Telegram Channel',
@@ -57,6 +57,12 @@ const TasksPage = ({ user }) => {
 
     setTasks(staticTasks);
     loadPropellerAd();
+
+    // Load completed tasks from localStorage
+    const stored = localStorage.getItem('completedTasks');
+    if (stored) {
+      setCompletedTasks(JSON.parse(stored));
+    }
   }, []);
 
   const startCountdown = (taskId) => {
@@ -73,30 +79,20 @@ const TasksPage = ({ user }) => {
   };
 
   const handleTaskClick = (task) => {
+    if (task.type !== 'monetag' && completedTasks.includes(task._id)) return;
+
     if (task.type === 'monetag') {
       showMonetagAd();
+      startCountdown(task._id);
     } else if (task.link) {
       window.open(task.link, '_blank');
+      startCountdown(task._id);
     }
-    startCountdown(task._id);
   };
 
-
-  
-
   const handleTaskComplete = async (taskId) => {
-    if (!user || !user.telegramId) {
-      console.error("User or telegramId is undefined");
-      return;
-    }
-    
     const task = tasks.find((t) => t._id === taskId);
-    if (!task) return;
-    console.log("Task payload: ", {
-      telegramId: user.telegramId,
-      taskName: task.name,
-      reward: task.reward,
-    });
+    if (!task || (task.type !== 'monetag' && completedTasks.includes(taskId))) return;
 
     try {
       await completeTask({
@@ -104,9 +100,22 @@ const TasksPage = ({ user }) => {
         taskName: task.name,
         reward: task.reward,
       });
+
+      if (task.type !== 'monetag') {
+        const updated = [...completedTasks, taskId];
+        setCompletedTasks(updated);
+        localStorage.setItem('completedTasks', JSON.stringify(updated));
+      }
+
       alert(`You've received ${task.reward} coins for completing: ${task.name}`);
     } catch (error) {
       console.error('Task completion error:', error);
+    } finally {
+      setTimers((prev) => {
+        const updated = { ...prev };
+        delete updated[taskId];
+        return updated;
+      });
     }
   };
 
@@ -119,9 +128,14 @@ const TasksPage = ({ user }) => {
           <button
             className="task-btn"
             onClick={() => handleTaskClick(task)}
-            disabled={timers[task._id] !== undefined}
+            disabled={
+              task.type !== 'monetag' &&
+              (completedTasks.includes(task._id) || timers[task._id] !== undefined)
+            }
           >
-            {timers[task._id] !== undefined
+            {task.type !== 'monetag' && completedTasks.includes(task._id)
+              ? 'Completed'
+              : timers[task._id] !== undefined
               ? `Rewarding in ${timers[task._id]}s`
               : `${task.reward} coins`}
           </button>
