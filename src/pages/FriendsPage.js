@@ -2,30 +2,26 @@
 import React, { useEffect, useState } from 'react';
 import BottomNav from '../components/BottomNav';
 import './FriendsPage.css';
-import { getUserProfile } from '../api/userApi'; // assumes you already have this
+import { getUserProfile } from '../api/userApi';
 
 function FriendsPage() {
   const [username, setUsername] = useState('');
   const [referralLink, setReferralLink] = useState('');
   const [referralCount, setReferralCount] = useState(null);
+  const generalLink = 'https://t.me/JawsGameBot/Jaws';
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
-
       const user = tg.initDataUnsafe?.user;
-      if (user && user.username) {
-        setUsername(user.username);
-        setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${user.username}`);
-        fetchReferralCount(user.id);
-      } else if (user && user.id) {
-        setUsername(user.id.toString());
-        setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${user.id}`);
+
+      if (user) {
+        const idOrUsername = user.username || user.id;
+        setUsername(idOrUsername);
+        setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${idOrUsername}`);
         fetchReferralCount(user.id);
       }
-    } else {
-      console.warn("Telegram WebApp not available");
     }
   }, []);
 
@@ -53,10 +49,17 @@ function FriendsPage() {
       </p>
 
       {referralLink ? (
-        <div className="referral-box">
-          <input type="text" value={referralLink} readOnly className='code' />
-          <button onClick={copyToClipboard} className='copy-button'>Copy</button>
-        </div>
+        <>
+          <div className="referral-box">
+            <input type="text" value={referralLink} readOnly className='code' />
+            <button onClick={copyToClipboard} className='copy-button'>Copy</button>
+          </div>
+
+          <div className="general-link-box mt-4">
+            <p className="text-white mb-1">General Link</p>
+            <input type="text" value={generalLink} readOnly className='code' />
+          </div>
+        </>
       ) : (
         <p className="text-white text-center">Loading referral link...</p>
       )}
