@@ -1,6 +1,6 @@
 // FriendsPage.js
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Table } from 'react-bootstrap';
+import { Modal, Button, Form, Table, Toast } from 'react-bootstrap';
 import { getUserProfile, updateUsername } from '../api/userApi';
 import './FriendsPage.css';
 
@@ -10,6 +10,7 @@ function FriendsPage() {
   const [usernameInput, setUsernameInput] = useState('');
   const [error, setError] = useState('');
   const [referrals, setReferrals] = useState([]);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -43,6 +44,12 @@ function FriendsPage() {
     }
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(referralLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const referralLink = `${window.location.origin}?ref=${user?.username}`;
 
   return (
@@ -51,15 +58,11 @@ function FriendsPage() {
       {user?.username && (
         <>
           <p>Share your referral link:</p>
-          <div className="referral-box">
-            <input type="text" value={referralLink} readOnly />
-            <Button
-              onClick={() => navigator.clipboard.writeText(referralLink)}
-              variant="secondary"
-            >
-              Copy
-            </Button>
+          <div className="referral-box d-flex align-items-center">
+            <input type="text" value={referralLink} readOnly className="form-control me-2" />
+            <Button onClick={handleCopy} variant="secondary">Copy</Button>
           </div>
+          {copied && <div className="text-success mt-2">Link copied!</div>}
         </>
       )}
 
