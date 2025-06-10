@@ -1,6 +1,5 @@
-// FriendsPage.js
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Table, Toast } from 'react-bootstrap';
+import { Modal, Button, Form, Table } from 'react-bootstrap';
 import { getUserProfile, updateUsername } from '../api/userApi';
 import './FriendsPage.css';
 
@@ -44,13 +43,16 @@ function FriendsPage() {
     }
   };
 
+  const referralLink = user?.username
+    ? `${window.location.origin}?ref=${user.username}`
+    : '';
+
   const handleCopy = () => {
+    if (!referralLink) return;
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const referralLink = `${window.location.origin}?ref=${user?.username}`;
 
   return (
     <div className="friends-page-container p-3">
