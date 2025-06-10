@@ -13,16 +13,7 @@ export const completeTask = async (data) => {
   }
 };
 
-// Get user profile (by Telegram ID)
-export const getUserProfile = async (telegramId) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/${telegramId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching user profile:', error.response?.data || error.message);
-    throw error;
-  }
-};
+
 
 export const getUserProfile = async (telegramId) => {
   const res = await axios.get(`${BASE_URL}/profile/${telegramId}`);
