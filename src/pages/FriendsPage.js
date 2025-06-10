@@ -19,8 +19,12 @@ function FriendsPage() {
           const profile = await getUserProfile(tgId);
           setUser(profile);
           setUsernameInput(profile.username || '');
-          if (!profile.username) setShowUsernameModal(true);
-          if (profile.referralDetails) setReferrals(profile.referralDetails);
+          if (!profile.username) {
+            setShowUsernameModal(true);
+          }
+          if (profile.referralDetails) {
+            setReferrals(profile.referralDetails);
+          }
         }
       } catch (err) {
         console.error(err.message);
@@ -57,21 +61,16 @@ function FriendsPage() {
   return (
     <div className="friends-page-container p-3">
       <h4>Invite Friends</h4>
-      <p>Share your referral link:</p>
-
-      <div className="referral-box d-flex align-items-center">
-        <input
-          type="text"
-          value={referralLink || 'Set a username to get your link'}
-          readOnly
-          className="form-control me-2"
-          disabled={!user?.username}
-        />
-        <Button onClick={handleCopy} variant="secondary" disabled={!user?.username}>
-          Copy
-        </Button>
-      </div>
-      {copied && <div className="text-success mt-2">Link copied!</div>}
+      {user?.username && (
+        <>
+          <p>Share your referral link:</p>
+          <div className="referral-box d-flex align-items-center">
+            <input type="text" value={referralLink} readOnly className="form-control me-2" />
+            <Button onClick={handleCopy} variant="secondary">Copy</Button>
+          </div>
+          {copied && <div className="text-success mt-2">Link copied!</div>}
+        </>
+      )}
 
       <hr />
 
@@ -99,6 +98,7 @@ function FriendsPage() {
         </Table>
       )}
 
+      {/* Username Modal - appears only once */}
       <Modal show={showUsernameModal} backdrop="static" centered>
         <Modal.Header>
           <Modal.Title>Set Your Username</Modal.Title>
