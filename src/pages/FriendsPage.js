@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Table } from 'react-bootstrap';
 import { getUserProfile, updateUsername } from '../api/userApi';
 import './FriendsPage.css';
@@ -10,34 +10,29 @@ function FriendsPage() {
   const [error, setError] = useState('');
   const [referrals, setReferrals] = useState([]);
   const [copied, setCopied] = useState(false);
-  const inputRef = useRef();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-        if (!tgId) return console.error('Telegram ID not found');
-        const profile = await getUserProfile(tgId);
-        setUser(profile);
-        setUsernameInput(profile.username || '');
-        if (!profile.username) setShowUsernameModal(true);
-        if (profile.referralDetails) setReferrals(profile.referralDetails);
+        if (tgId) {
+          const profile = await getUserProfile(tgId);
+          setUser(profile);
+          setUsernameInput(profile.username || '');
+          if (!profile.username) setShowUsernameModal(true);
+          if (profile.referralDetails) setReferrals(profile.referralDetails);
+        }
       } catch (err) {
-        console.error('Fetch profile failed:', err.message);
+        console.error(err.message);
       }
     };
     fetchProfile();
   }, []);
 
-  useEffect(() => {
-    if (showUsernameModal && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [showUsernameModal]);
-
   const handleUsernameSubmit = async () => {
-    if (!usernameInput.trim()) return setError("Username is required");
-
+    if (!usernameInput.trim()) {
+      return setError("Username is required");
+    }
     try {
       const res = await updateUsername(user.telegramId, usernameInput.trim());
       setUser({ ...user, username: usernameInput.trim() });
@@ -62,23 +57,21 @@ function FriendsPage() {
   return (
     <div className="friends-page-container p-3">
       <h4>Invite Friends</h4>
+      <p>Share your referral link:</p>
 
-      {user?.username && (
-        <>
-          <p>Share your referral link:</p>
-          <div className="referral-box d-flex align-items-center mb-2">
-            <input
-              type="text"
-              value={referralLink}
-              readOnly
-              className="form-control me-2"
-            />
-            <Button onClick={handleCopy} variant="secondary">
-              {copied ? "Copied!" : "Copy"}
-            </Button>
-          </div>
-        </>
-      )}
+      <div className="referral-box d-flex align-items-center">
+        <input
+          type="text"
+          value={referralLink || 'Set a username to get your link'}
+          readOnly
+          className="form-control me-2"
+          disabled={!user?.username}
+        />
+        <Button onClick={handleCopy} variant="secondary" disabled={!user?.username}>
+          Copy
+        </Button>
+      </div>
+      {copied && <div className="text-success mt-2">Link copied!</div>}
 
       <hr />
 
@@ -86,7 +79,7 @@ function FriendsPage() {
       {referrals.length === 0 ? (
         <p>No referrals yet.</p>
       ) : (
-        <Table striped bordered hover responsive>
+        <Table striped bordered hover>
           <thead>
             <tr>
               <th>Username</th>
@@ -98,8 +91,8 @@ function FriendsPage() {
             {referrals.map((ref, index) => (
               <tr key={index}>
                 <td>{ref.referredUser?.username || "Unknown"}</td>
-                <td>{ref.reward?.toLocaleString()} 🪙</td>
-                <td>{new Date(ref.date).toLocaleString()}</td>
+                <td>{ref.reward} 🪙</td>
+                <td>{new Date(ref.date).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
@@ -114,7 +107,6 @@ function FriendsPage() {
           <Form.Group>
             <Form.Label>Username</Form.Label>
             <Form.Control
-              ref={inputRef}
               type="text"
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
