@@ -20,7 +20,7 @@ function FriendsPage() {
           setUser(profile);
           setUsernameInput(profile.username || '');
           if (!profile.username) {
-            setShowUsernameModal(true);
+            setShowUsernameModal(true); // Only show if not set
           }
           if (profile.referralDetails) {
             setReferrals(profile.referralDetails);
@@ -61,6 +61,7 @@ function FriendsPage() {
   return (
     <div className="friends-page-container p-3">
       <h4>Invite Friends</h4>
+
       {user?.username && (
         <>
           <p>Share your referral link:</p>
@@ -98,8 +99,8 @@ function FriendsPage() {
         </Table>
       )}
 
-      {/* Username Modal - appears only once */}
-      <Modal show={showUsernameModal} backdrop="static" centered>
+      {/* Username Modal – non-dismissable and single-use */}
+      <Modal show={showUsernameModal} backdrop="static" keyboard={false} centered>
         <Modal.Header>
           <Modal.Title>Set Your Username</Modal.Title>
         </Modal.Header>
