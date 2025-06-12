@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getUserProfile, updateUsername } from '../utils/userApi';
+import { fetchUserProfile, updateUsername, fetchReferrals } from '../utils/userApi';
 
 const FriendsPage = () => {
   const [telegramId, setTelegramId] = useState('');
@@ -7,27 +7,33 @@ const FriendsPage = () => {
   const [referralLink, setReferralLink] = useState('');
   const [referrals, setReferrals] = useState([]);
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+
     if (telegramUser) {
       const id = telegramUser.id;
-      const uname = telegramUser.username;
+      const uname = telegramUser.username || `user${id}`; // fallback if username is missing
 
       setTelegramId(id);
       setUsername(uname);
       setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${uname}`);
 
-      // Update backend with Telegram username
       updateUsername(id, uname)
         .then(() => {
-          getUserProfile(id).then((data) => {
-            setReferrals(data.referrals || []);
-          });
+          return fetchReferrals(id);
         })
-        .catch((err) => console.error('Username update error:', err));
+        .then((res) => {
+          setReferrals(res.data || []);
+        })
+        .catch((err) => {
+          console.error('Error loading referral data:', err);
+        })
+        .finally(() => setLoading(false));
     } else {
       console.warn('Telegram WebApp not available. Please open from Telegram.');
+      setLoading(false);
     }
   }, []);
 
@@ -45,29 +51,48 @@ const FriendsPage = () => {
       <p>Share your referral link and earn rewards when your friends join and start clicking!</p>
 
       {referralLink ? (
-        <div>
+        <div style={{ marginBottom: '20px' }}>
           <input
             type="text"
             value={referralLink}
             readOnly
-            style={{ width: '80%', padding: '10px', marginTop: '10px', borderRadius: '5px' }}
+            style={{
+              width: '80%',
+              padding: '10px',
+              marginTop: '10px',
+              borderRadius: '5px',
+              textAlign: 'center',
+            }}
           />
-          <button onClick={handleCopy} style={{ marginLeft: '10px', padding: '10px 20px' }}>
+          <button
+            onClick={handleCopy}
+            style={{
+              marginLeft: '10px',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              backgroundColor: '#00aaff',
+              color: '#fff',
+              border: 'none',
+            }}
+          >
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
       ) : (
-        <p style={{ marginTop: '20px' }}>Loading referral link... Make sure you're opening this app from Telegram.</p>
+        <p style={{ marginTop: '20px' }}>Loading referral link... Please open this app from Telegram.</p>
       )}
 
       <h3 style={{ marginTop: '30px' }}>Your Referrals</h3>
-      {referrals.length === 0 ? (
+      {loading ? (
+        <p>Loading...</p>
+      ) : referrals.length === 0 ? (
         <p>No referrals yet.</p>
       ) : (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {referrals.map((ref, index) => (
             <li key={index} style={{ margin: '10px 0' }}>
-              @{ref.username} - Earned: {ref.reward} clicks
+              @{ref.referredUser?.username || 'Unknown'} - Earned: {ref.reward} clicks
             </li>
           ))}
         </ul>
