@@ -38,8 +38,12 @@ function FriendsPage() {
       return setError("Username is required");
     }
     try {
-      const res = await updateUsername(user.telegramId, usernameInput.trim());
-      setUser({ ...user, username: usernameInput.trim() });
+      await updateUsername(user.telegramId, usernameInput.trim());
+
+      // Fetch updated profile to reflect username in UI
+      const updatedProfile = await getUserProfile(user.telegramId);
+      setUser(updatedProfile);
+      setUsernameInput(updatedProfile.username || '');
       setShowUsernameModal(false);
       setError('');
     } catch (err) {
