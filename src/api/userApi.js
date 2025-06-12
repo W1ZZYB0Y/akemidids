@@ -13,14 +13,24 @@ export const completeTask = async (data) => {
   }
 };
 
-// Get user profile
-export const getUserProfile = async (telegramId) => {
-  const res = await axios.get(`${BASE_URL}/profile/${telegramId}`);
-  return res.data;
+// Get user profile by telegramId or username fallback
+export const getUserProfile = async (telegramIdOrUsername) => {
+  try {
+    const res = await axios.get(`${BASE_URL}/profile/${telegramIdOrUsername}`);
+    return res.data;
+  } catch (error) {
+    console.error("Get User Profile Error:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
 // Update Telegram username
 export const updateUsername = async (telegramId, username) => {
-  const res = await axios.post(`${BASE_URL}/update-username`, { telegramId, username });
-  return res.data;
+  try {
+    const res = await axios.post(`${BASE_URL}/update-username`, { telegramId, username });
+    return res.data;
+  } catch (error) {
+    console.error("Update Username Error:", error.response?.data || error.message);
+    throw error;
+  }
 };
