@@ -16,7 +16,7 @@ const FriendsPage = () => {
 
       setTelegramId(id);
       setUsername(uname);
-      setReferralLink(`https://t.me/YOUR_BOT_USERNAME?start=${uname}`);
+      setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${uname}`);
 
       // Update backend with Telegram username
       updateUsername(id, uname)
