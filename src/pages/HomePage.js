@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, ProgressBar } from 'react-bootstrap';
 import BottomNav from '../components/BottomNav';
 import './HomePage.css';
-import { getUserProfile } from '../api/userApi';
+import { getUserProfile, updateUsername } from '../api/userApi'; // <-- Add updateUsername
 
 function HomePage() {
   const MAX_CLICKS = 10;
@@ -90,9 +90,16 @@ function HomePage() {
       const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
       if (tgUser?.id) {
         const telegramId = tgUser.id;
+        const username = tgUser.username;
+
+        // Update backend with username if it exists
+        if (username) {
+          updateUsername(telegramId, username).catch(console.error);
+        }
+
         getUserProfile(telegramId)
           .then(profile => {
-            const fullProfile = { ...profile, telegramId };
+            const fullProfile = { ...profile, telegramId, username };
             setUser(fullProfile);
             setBalance(profile.balance || 0);
             updateRank(profile.balance || 0);
@@ -149,7 +156,6 @@ function HomePage() {
 
   return (
     <div className="homepage-container">
-      {/* Rank Section */}
       <div className="rank-section text-center mb-4">
         <div className="d-flex justify-content-center align-items-center gap-3">
           <img src={currentRankObj.image} alt={rank} className="rank-image" />
@@ -165,7 +171,6 @@ function HomePage() {
         )}
       </div>
 
-      {/* Clicker Section */}
       <div className="text-center my-4">
         <img
           src="/clicker.png"
@@ -178,16 +183,13 @@ function HomePage() {
         )}
       </div>
 
-      {/* Footer Stats */}
       <div className="footer-stats-container">
         <div className="left-stat">Clicks Left: {clicksLeft} / {MAX_CLICKS}</div>
         <div className="right-stat">Balance: {balance}</div>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav />
 
-      {/* Rank-Up Modal */}
       <Modal show={showRankUp} onHide={() => setShowRankUp(false)} centered backdrop="static">
         <Modal.Body className="text-center rank-up-modal">
           <img src={currentRankObj.image} alt={rank} className="rank-up-image mb-3" />
