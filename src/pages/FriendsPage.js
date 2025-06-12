@@ -12,45 +12,58 @@ function FriendsPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-        if (tgId) {
-          const profile = await getUserProfile(tgId);
-          setUser(profile);
-          setUsernameInput(profile.username || '');
-          if (!profile.username) {
-            setShowUsernameModal(true); // Only show if not set
-          }
-          if (profile.referralDetails) {
-            setReferrals(profile.referralDetails);
-          }
-        }
-      } catch (err) {
-        console.error(err.message);
-      }
-    };
-    fetchProfile();
-  }, []);
+  const fetchProfile = async () => {
+    const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    console.log("Telegram ID:", tgId);
 
-  const handleUsernameSubmit = async () => {
-    if (!usernameInput.trim()) {
-      return setError("Username is required");
+    if (!tgId) {
+      console.warn("Telegram ID not found. WebApp might not be initialized.");
+      return;
     }
-    try {
-      await updateUsername(user.telegramId, usernameInput.trim());
 
-      // Fetch updated profile to reflect username in UI
-      const updatedProfile = await getUserProfile(user.telegramId);
-      setUser(updatedProfile);
-      setUsernameInput(updatedProfile.username || '');
-      setShowUsernameModal(false);
-      setError('');
+    try {
+      const profile = await getUserProfile(tgId);
+      console.log("Fetched user profile:", profile);
+
+      setUser(profile);
+      setUsernameInput(profile.username || '');
+
+      if (!profile.username) {
+        setShowUsernameModal(true);
+      }
+
+      if (profile.referralDetails) {
+        setReferrals(profile.referralDetails);
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Username not available");
+      console.error("Error fetching user profile:", err.message);
     }
   };
 
+  fetchProfile();
+}, []);
+
+const handleUsernameSubmit = async () => {
+  if (!usernameInput.trim()) {
+    return setError("Username is required");
+  }
+
+  try {
+    await updateUsername(user.telegramId, usernameInput.trim());
+
+    // Fetch updated profile with fallback
+    const updatedProfile = await getUserProfile(user.telegramId || usernameInput.trim());
+
+    setUser(updatedProfile);
+    setUsernameInput(updatedProfile.username || '');
+    setShowUsernameModal(false);
+    setError('');
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || "Username not available");
+  }
+};
+  
   const referralLink = user?.username
     ? `${window.location.origin}?ref=${user.username}`
     : '';
