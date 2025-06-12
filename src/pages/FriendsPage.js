@@ -48,7 +48,7 @@ function FriendsPage() {
   };
 
   const referralLink = user?.username
-    ? ${window.location.origin}?ref=${user.username}
+    ? `${window.location.origin}?ref=${user.username}`
     : '';
 
   const handleCopy = () => {
@@ -62,7 +62,7 @@ function FriendsPage() {
     <div className="friends-page-container p-3">
       <h4>Invite Friends</h4>
 
-      {user?.username ? (
+      {user?.username && (
         <>
           <p>Share your referral link:</p>
           <div className="referral-box d-flex align-items-center">
@@ -71,8 +71,6 @@ function FriendsPage() {
           </div>
           {copied && <div className="text-success mt-2">Link copied!</div>}
         </>
-      ) : (
-        <p className="text-muted mt-3">Please set your username to get your referral link.</p>
       )}
 
       <hr />
