@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchUserProfile, updateUsername } from '../api/userApi';
+import { getUserProfile, updateUsername } from '../api/userApi';
 
 const FriendsPage = () => {
   const [telegramId, setTelegramId] = useState('');
