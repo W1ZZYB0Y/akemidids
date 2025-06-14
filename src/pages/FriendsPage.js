@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getUserProfile, updateUsername } from '../api/userApi';
 
 const FriendsPage = () => {
-  const [telegramId, setTelegramId] = useState('');
-  const [username, setUsername] = useState('');
+  const [referralId, setReferralId] = useState('');
   const [referralLink, setReferralLink] = useState('');
   const [referrals, setReferrals] = useState([]);
   const [copied, setCopied] = useState(false);
@@ -13,26 +12,24 @@ const FriendsPage = () => {
     const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
 
     if (telegramUser) {
-      const id = telegramUser.id;
-      const uname = telegramUser.username || `user${id}`; // fallback if no username
+      const telegramId = telegramUser.id;
+      const telegramUsername = telegramUser.username || `user${telegramId}`;
 
-      setTelegramId(id);
-      setUsername(uname);
-
-      const referral = `https://t.me/JawsGameBot?start=${uname}`;
-      setReferralLink(referral);
-
-      updateUsername(id, uname)
-        .then(() => getUserProfile(id))
-        .then((res) => {
-          setReferrals(res.referrals || []);
+      // Update backend with Telegram username
+      updateUsername(telegramId, telegramUsername)
+        .then(() => getUserProfile(telegramId))
+        .then((user) => {
+          const id = user._id;
+          setReferralId(id);
+          setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${id}`);
+          setReferrals(user.referrals || []);
         })
         .catch((err) => {
-          console.error('Error loading referral data:', err);
+          console.error('Error loading profile:', err);
         })
         .finally(() => setLoading(false));
     } else {
-      console.warn('Telegram WebApp not available.');
+      console.warn('Telegram WebApp not available. Please open from Telegram.');
       setLoading(false);
     }
   }, []);
@@ -92,7 +89,7 @@ const FriendsPage = () => {
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {referrals.map((ref, index) => (
             <li key={index} style={{ margin: '10px 0' }}>
-              @{ref.username || 'Unknown'} - Earned: {ref.reward} clicks
+              @{ref.username || 'Unknown'} - Earned: {ref.reward || 0} clicks
             </li>
           ))}
         </ul>
