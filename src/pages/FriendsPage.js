@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchUserProfile, updateUsername, fetchReferrals } from '../api/userApi';
+import { fetchUserProfile, updateUsername } from '../api/userApi';
 
 const FriendsPage = () => {
   const [telegramId, setTelegramId] = useState('');
@@ -14,18 +14,16 @@ const FriendsPage = () => {
 
     if (telegramUser) {
       const id = telegramUser.id;
-      const uname = telegramUser.username || `user${id}`; // fallback if username is missing
+      const uname = telegramUser.username || `user${id}`;
 
       setTelegramId(id);
       setUsername(uname);
       setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${uname}`);
 
       updateUsername(id, uname)
-        .then(() => {
-          return fetchReferrals(id);
-        })
+        .then(() => fetchUserProfile(id))
         .then((res) => {
-          setReferrals(res.data || []);
+          setReferrals(res.data?.referrals || []);
         })
         .catch((err) => {
           console.error('Error loading referral data:', err);
@@ -92,7 +90,7 @@ const FriendsPage = () => {
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {referrals.map((ref, index) => (
             <li key={index} style={{ margin: '10px 0' }}>
-              @{ref.referredUser?.username || 'Unknown'} - Earned: {ref.reward} clicks
+              @{ref.username || 'Unknown'} - Earned: {ref.reward} clicks
             </li>
           ))}
         </ul>
