@@ -21,7 +21,7 @@ const FriendsPage = () => {
       setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${uname}`);
 
       updateUsername(id, uname)
-        .then(() => fetchUserProfile(id))
+        .then(() => getUserProfile(id))
         .then((res) => {
           setReferrals(res.data?.referrals || []);
         })
