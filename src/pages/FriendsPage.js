@@ -14,23 +14,25 @@ const FriendsPage = () => {
 
     if (telegramUser) {
       const id = telegramUser.id;
-      const uname = telegramUser.username || `user${id}`;
+      const uname = telegramUser.username || `user${id}`; // fallback if no username
 
       setTelegramId(id);
       setUsername(uname);
-      setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${uname}`);
+
+      const referral = `https://t.me/JawsGameBot?start=${uname}`;
+      setReferralLink(referral);
 
       updateUsername(id, uname)
         .then(() => getUserProfile(id))
         .then((res) => {
-          setReferrals(res.data?.referrals || []);
+          setReferrals(res.referrals || []);
         })
         .catch((err) => {
           console.error('Error loading referral data:', err);
         })
         .finally(() => setLoading(false));
     } else {
-      console.warn('Telegram WebApp not available. Please open from Telegram.');
+      console.warn('Telegram WebApp not available.');
       setLoading(false);
     }
   }, []);
