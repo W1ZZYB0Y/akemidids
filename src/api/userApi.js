@@ -1,8 +1,8 @@
+// src/api/userApi.js or ../api/userApi.js depending on your structure
 import axios from 'axios';
 
 const BASE_URL = 'https://akemidids-backend.onrender.com/api/users';
 
-// Complete a task
 export const completeTask = async (data) => {
   try {
     const response = await axios.post(`${BASE_URL}/task`, data);
@@ -13,7 +13,6 @@ export const completeTask = async (data) => {
   }
 };
 
-// Get user profile by telegramId or username fallback
 export const getUserProfile = async (telegramIdOrUsername) => {
   try {
     const res = await axios.get(`${BASE_URL}/profile/${telegramIdOrUsername}`);
@@ -24,7 +23,6 @@ export const getUserProfile = async (telegramIdOrUsername) => {
   }
 };
 
-// Update Telegram username
 export const updateUsername = async (telegramId, username) => {
   try {
     const res = await axios.post(`${BASE_URL}/update-username`, { telegramId, username });
@@ -34,5 +32,3 @@ export const updateUsername = async (telegramId, username) => {
     throw error;
   }
 };
-
-
