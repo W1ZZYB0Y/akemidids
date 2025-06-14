@@ -13,13 +13,13 @@ export const completeTask = async (data) => {
   }
 };
 
-// Fetch user profile (by telegramId or username)
-export const fetchUserProfile = async (telegramIdOrUsername) => {
+// Get user profile by telegramId or username fallback
+export const getUserProfile = async (telegramIdOrUsername) => {
   try {
     const res = await axios.get(`${BASE_URL}/profile/${telegramIdOrUsername}`);
     return res.data;
   } catch (error) {
-    console.error("Fetch User Profile Error:", error.response?.data || error.message);
+    console.error("Get User Profile Error:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -34,3 +34,6 @@ export const updateUsername = async (telegramId, username) => {
     throw error;
   }
 };
+
+// Export all the functions
+export { getUserProfile, updateUsername, completeTask };
