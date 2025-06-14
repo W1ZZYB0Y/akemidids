@@ -35,5 +35,4 @@ export const updateUsername = async (telegramId, username) => {
   }
 };
 
-// Export all the functions
-export { getUserProfile, updateUsername, completeTask };
+
