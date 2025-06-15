@@ -13,6 +13,7 @@ export const completeTask = async (data) => {
   }
 };
 
+// Ensure the endpoint returns the user's referrals based on their userId
 export const getUserProfile = async (telegramIdOrUsername) => {
   try {
     const res = await axios.get(`${BASE_URL}/profile/${telegramIdOrUsername}`);
@@ -22,7 +23,6 @@ export const getUserProfile = async (telegramIdOrUsername) => {
     throw error;
   }
 };
-
 export const updateUsername = async (telegramId, username) => {
   try {
     const res = await axios.post(`${BASE_URL}/update-username`, { telegramId, username });
