@@ -10,40 +10,40 @@ const FriendsPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+  const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
 
-    if (telegramUser) {
-      const id = telegramUser.id;
-      const uname = telegramUser.username || `user${id}`;
+  if (telegramUser) {
+    const id = telegramUser.id;
+    const uname = telegramUser.username || `user${id}`;
 
-      setTelegramId(id);
+    setTelegramId(id);
 
-      // Update Telegram username in backend
-      updateUsername(id, uname)
-        .then(() => getUserProfile(id))
-        .then((userData) => {
-          if (userData) {
-            setUserId(userData._id); // store user's MongoDB ID
-            setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${userData._id}`);
-            setReferrals(userData.referrals || []);
-          }
-        })
-        .catch((err) => console.error('Error loading profile:', err))
-        .finally(() => setLoading(false));
-    } else {
-      console.warn('Telegram WebApp not available. Please open from Telegram.');
-      setLoading(false);
-    }
-  }, []);
+    // Update Telegram username in backend
+    updateUsername(id, uname)
+      .then(() => getUserProfile(id))
+      .then((userData) => {
+        if (userData) {
+          setUserId(userData._id); // store user's MongoDB ID
+          // Generate referral link based on user ID
+          setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${userData._id}`);
+          setReferrals(userData.referrals || []);
+        }
+      })
+      .catch((err) => console.error('Error loading profile:', err))
+      .finally(() => setLoading(false));
+  } else {
+    console.warn('Telegram WebApp not available. Please open from Telegram.');
+    setLoading(false);
+  }
+}, []);
 
-  const handleCopy = () => {
-    if (referralLink) {
-      navigator.clipboard.writeText(referralLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    }
-  };
-
+ const handleCopy = () => {
+  if (referralLink) {
+    navigator.clipboard.writeText(referralLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+};
   return (
     <div className="friends-container" style={{ padding: '20px', textAlign: 'center', color: '#fff' }}>
       <h2>Invite Your Friends</h2>
