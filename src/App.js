@@ -14,7 +14,8 @@ import { showMonetagAd } from './utils/monetagLoader';
 
 function App() {
   const [user, setUser] = useState(null);
-
+  const userRoutes = require('./routes/userRoutes');
+  app.use('/api/users', userRoutes);
   useEffect(() => {
     // Telegram initialization
     if (window.Telegram?.WebApp) {
