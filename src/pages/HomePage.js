@@ -5,7 +5,7 @@ import './HomePage.css';
 import { getUserProfile, updateUsername } from '../api/userApi'; // <-- Add updateUsername
 
 function HomePage() {
-  const MAX_CLICKS = 10;
+  const MAX_CLICKS = 50;
   const [balance, setBalance] = useState(0);
   const [clicksLeft, setClicksLeft] = useState(MAX_CLICKS);
   const [progress, setProgress] = useState(0);
