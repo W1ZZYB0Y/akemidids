@@ -1,83 +1,102 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { getUserProfile, updateUsername } from '../api/userApi';
 
 const FriendsPage = () => {
-  const [username, setUsername] = useState('');
-  const [referrals, setReferrals] = useState([]);
+  const [telegramId, setTelegramId] = useState('');
   const [userId, setUserId] = useState('');
   const [referralLink, setReferralLink] = useState('');
-  const [inputUsername, setInputUsername] = useState('');
-
-  const fetchReferrals = async () => {
-    if (!username) return;
-    try {
-      const res = await axios.get(`/api/users/referrals/${username}`);
-      setReferrals(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchUserId = async () => {
-    try {
-      const res = await axios.get(`/api/users/telegram/${window.Telegram.WebApp.initDataUnsafe?.user?.id}`);
-      setUserId(res.data._id);
-      setUsername(res.data.username);
-      setReferralLink(`${window.location.origin}?ref=${res.data.username}`);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleUsernameSubmit = async () => {
-    try {
-      await axios.post(`/api/users/update-username`, {
-        telegramId: window.Telegram.WebApp.initDataUnsafe?.user?.id,
-        username: inputUsername
-      });
-      setUsername(inputUsername);
-      setReferralLink(`${window.location.origin}?ref=${inputUsername}`);
-      fetchReferrals();
-    } catch (err) {
-      alert('Username is taken or invalid.');
-    }
-  };
+  const [referrals, setReferrals] = useState([]);
+  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserId();
+    const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+
+    if (telegramUser) {
+      const id = telegramUser.id;
+      const uname = telegramUser.username || `user${id}`;
+
+      setTelegramId(id);
+
+      // Sync username in the backend
+      updateUsername(id, uname)
+        .then(() => getUserProfile(id))
+        .then((userData) => {
+          if (userData) {
+            setUserId(userData._id); // MongoDB _id
+            setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${userData._id}`);
+            setReferrals(userData.referralDetails || []);
+          }
+        })
+        .catch((err) => {
+          console.error('Error loading profile:', err);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      console.warn('Telegram WebApp not available.');
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => {
-    if (username) fetchReferrals();
-  }, [username]);
+  const handleCopy = () => {
+    if (referralLink) {
+      navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
 
   return (
-    <div className="container">
-      {!username ? (
-        <div>
-          <p>Enter your Telegram username:</p>
-          <input value={inputUsername} onChange={(e) => setInputUsername(e.target.value)} />
-          <button onClick={handleUsernameSubmit}>Save Username</button>
+    <div className="friends-container" style={{ padding: '20px', textAlign: 'center', color: '#fff' }}>
+      <h2>Invite Your Friends</h2>
+      <p>Share your referral link and earn rewards when your friends join and start clicking!</p>
+
+      {referralLink ? (
+        <div style={{ marginBottom: '20px' }}>
+          <input
+            type="text"
+            value={referralLink}
+            readOnly
+            style={{
+              width: '80%',
+              padding: '10px',
+              marginTop: '10px',
+              borderRadius: '5px',
+              textAlign: 'center',
+            }}
+          />
+          <button
+            onClick={handleCopy}
+            style={{
+              marginLeft: '10px',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              backgroundColor: '#00aaff',
+              color: '#fff',
+              border: 'none',
+            }}
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
         </div>
       ) : (
-        <>
-          <h3>Your Referral Link</h3>
-          <input value={referralLink} readOnly />
-          <button onClick={() => navigator.clipboard.writeText(referralLink)}>Copy</button>
+        <p style={{ marginTop: '20px' }}>Loading referral link... Please open this app from Telegram.</p>
+      )}
 
-          <h4>Referrals</h4>
-          {referrals.length === 0 ? (
-            <p>No referrals yet.</p>
-          ) : (
-            <ul>
-              {referrals.map((ref, index) => (
-                <li key={index}>
-                  @{ref.referredUser?.username || 'N/A'} – Reward: {ref.reward} coins
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
+      <h3 style={{ marginTop: '30px' }}>Your Referrals</h3>
+      {loading ? (
+        <p>Loading...</p>
+      ) : referrals.length === 0 ? (
+        <p>No referrals yet.</p>
+      ) : (
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {referrals.map((ref, index) => (
+            <li key={index} style={{ margin: '10px 0' }}>
+              @{ref.referredUser?.username || 'Unknown'} — Earned: {ref.reward} clicks
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
