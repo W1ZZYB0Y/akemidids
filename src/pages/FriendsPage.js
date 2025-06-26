@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getUserProfile, updateUsername } from '../api/userApi';
+import BottomNav from '../components/BottomNav';
 
 const FriendsPage = () => {
   const [telegramId, setTelegramId] = useState('');
@@ -18,12 +19,12 @@ const FriendsPage = () => {
 
       setTelegramId(id);
 
-      // Sync username in the backend
+      // Update the username in your backend
       updateUsername(id, uname)
         .then(() => getUserProfile(id))
         .then((userData) => {
           if (userData) {
-            setUserId(userData._id); // MongoDB _id
+            setUserId(userData._id); // Mongo user id
             setReferralLink(`https://t.me/JawsGameBot/Jaws?start=${userData._id}`);
             setReferrals(userData.referralDetails || []);
           }
@@ -49,7 +50,7 @@ const FriendsPage = () => {
   return (
     <div className="friends-container" style={{ padding: '20px', textAlign: 'center', color: '#fff' }}>
       <h2>Invite Your Friends</h2>
-      <p>Share your referral link and earn rewards when your friends join and start clicking!</p>
+      <p>Share your referral link and earn rewards when your friends join and click!</p>
 
       {referralLink ? (
         <div style={{ marginBottom: '20px' }}>
@@ -57,13 +58,7 @@ const FriendsPage = () => {
             type="text"
             value={referralLink}
             readOnly
-            style={{
-              width: '80%',
-              padding: '10px',
-              marginTop: '10px',
-              borderRadius: '5px',
-              textAlign: 'center',
-            }}
+            style={{ width: '80%', padding: '10px', marginTop: '10px', borderRadius: '5px', textAlign: 'center' }}
           />
           <button
             onClick={handleCopy}
@@ -98,6 +93,8 @@ const FriendsPage = () => {
           ))}
         </ul>
       )}
+
+      <BottomNav />
     </div>
   );
 };
